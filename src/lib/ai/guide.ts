@@ -3,18 +3,37 @@ import "server-only";
 import type Anthropic from "@anthropic-ai/sdk";
 import type { LoadedModule } from "@/lib/modules/schema";
 import { getAnthropic, MODELS } from "./anthropic";
-import { buildMentoringSystem, buildMentoringUserMessage } from "./prompts";
+import {
+  buildDraftContext,
+  buildMentoringSystem,
+  buildMentoringUserMessage,
+} from "./prompts";
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
 
 // Resposta do AI Guide. Mentoria = Haiku (rotineiro). Toda fala do Builder vai
 // embrulhada como dado (anti-injeção). Nunca entrega a solução.
+// `draft` = o entregável atual do editor: contexto vivo do que ele constrói.
 export async function mentorReply(
   mod: LoadedModule,
   turns: ChatTurn[],
+  draft?: string,
 ): Promise<string> {
   const client = getAnthropic();
-  const system = buildMentoringSystem(mod);
+
+  // Bloco estável (instruções + módulo) vai CACHED — barato em chamadas
+  // repetidas. O entregável atual entra num bloco pequeno SEM cache (ele muda),
+  // pra o Guide sempre enxergar o que está sendo construído.
+  const systemBlocks: Anthropic.TextBlockParam[] = [
+    {
+      type: "text",
+      text: buildMentoringSystem(mod),
+      cache_control: { type: "ephemeral" },
+    },
+  ];
+  if (draft && draft.trim().length > 0) {
+    systemBlocks.push({ type: "text", text: buildDraftContext(draft) });
+  }
 
   const messages = turns.map((t) => ({
     role: t.role,
@@ -26,9 +45,7 @@ export async function mentorReply(
     model: MODELS.routine,
     max_tokens: 600,
     temperature: 0.4,
-    system: [
-      { type: "text", text: system, cache_control: { type: "ephemeral" } },
-    ],
+    system: systemBlocks,
     messages,
   });
 

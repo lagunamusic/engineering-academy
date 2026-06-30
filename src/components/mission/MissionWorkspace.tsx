@@ -175,7 +175,11 @@ export function MissionWorkspace(props: {
 
           {/* Coluna lateral: AI Guide (desktop), em cima no mobile */}
           <div className="order-first h-[560px] lg:order-none lg:sticky lg:top-6">
-            <AiGuideChat moduleId={props.moduleId} opener={props.opener} />
+            <AiGuideChat
+              moduleId={props.moduleId}
+              opener={props.opener}
+              draft={draft}
+            />
           </div>
         </section>
       )}

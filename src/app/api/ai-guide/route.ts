@@ -19,6 +19,8 @@ const bodySchema = z.object({
     )
     .min(1)
     .max(200), // teto de abuso; mandamos só uma janela recente pro modelo
+  // Entregável atual do editor: contexto vivo do que o Builder constrói.
+  draft: z.string().max(20_000).optional(),
 });
 
 export async function POST(request: Request) {
@@ -78,7 +80,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const reply = await mentorReply(mod, turns);
+    const reply = await mentorReply(mod, turns, parsed.data.draft);
     return NextResponse.json({ reply });
   } catch (err) {
     return NextResponse.json(

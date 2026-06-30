@@ -7,9 +7,11 @@ type ChatTurn = { role: "user" | "assistant"; content: string };
 export function AiGuideChat({
   moduleId,
   opener,
+  draft,
 }: {
   moduleId: string;
   opener: string;
+  draft?: string;
 }) {
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [input, setInput] = useState("");
@@ -28,10 +30,12 @@ export function AiGuideChat({
       const res = await fetch("/api/ai-guide", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        // Só manda turnos com conteúdo — vazio não trafega.
+        // Só manda turnos com conteúdo — vazio não trafega. Manda também o
+        // rascunho atual: o Guide vê o que está sendo construído.
         body: JSON.stringify({
           moduleId,
           turns: nextTurns.filter((t) => t.content.trim().length > 0),
+          draft,
         }),
       });
       const data = await res.json();
