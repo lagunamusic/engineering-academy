@@ -18,7 +18,7 @@ const bodySchema = z.object({
       }),
     )
     .min(1)
-    .max(60),
+    .max(200), // teto de abuso; mandamos só uma janela recente pro modelo
 });
 
 export async function POST(request: Request) {
@@ -65,11 +65,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Módulo não encontrado." }, { status: 404 });
   }
 
-  // Descarta turnos vazios (uma resposta vazia da IA não pode travar o chat)
-  // e garante que sobrou algo pra responder.
-  const turns = parsed.data.turns.filter(
-    (t) => t.content.trim().length > 0,
-  ) as ChatTurn[];
+  // Descarta turnos vazios e manda só a JANELA recente (últimos 30) pro modelo:
+  // bound de contexto + custo, e conversa longa nunca estoura o limite.
+  const turns = (
+    parsed.data.turns.filter((t) => t.content.trim().length > 0) as ChatTurn[]
+  ).slice(-30);
   if (turns.length === 0) {
     return NextResponse.json(
       { error: "Mensagem vazia." },
