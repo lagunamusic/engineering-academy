@@ -1,26 +1,157 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Engineering Academy — Design System
+  Vibe: cockpit de engenharia dark e premium, alma de ferramenta de dev.
+  O glow é RESERVADO pros momentos de progresso. Nada de firula espalhada.
+  Tokens definidos uma vez aqui (Tailwind v4 é CSS-first), usados no app inteiro.
+*/
+
+@theme {
+  /* ---- Cores: superfícies ---- */
+  --color-bg: #0b0b0f; /* fundo base */
+  --color-surface: #14141a; /* cards, painéis */
+  --color-surface-high: #1c1c24; /* elementos elevados, hover */
+  --color-border: #2a2a34; /* bordas sutis */
+
+  /* ---- Cores: texto ---- */
+  --color-fg: #ececf1; /* texto primário */
+  --color-muted: #9a9aa8; /* texto suave, secundário */
+
+  /* ---- Cores: acento (ember) ---- */
+  --color-ember: #ff7a1a; /* o acento da casa */
+  --color-ember-glow: #ff9a4a; /* variante glow pros momentos de progresso */
+  --color-ember-deep: #c75a0f; /* ember escuro pra bordas/sombras */
+
+  /* ---- Cores: semânticas ---- */
+  --color-success: #3fb950;
+  --color-danger: #f85149;
+  --color-warning: #e3b341;
+
+  /* ---- Capacidade arrefecida (cooled por leak): cinza-azulado dessaturado ---- */
+  --color-cooled: #59607a;
+
+  /* ---- Fontes ---- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
+
+  /* ---- Sombras / glow ---- */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(42, 42, 52, 0.6);
+  --shadow-glow: 0 0 24px -2px rgba(255, 122, 26, 0.45);
+  --shadow-glow-soft: 0 0 16px -4px rgba(255, 122, 26, 0.3);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---- Base ---- */
+html {
+  height: 100%;
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Seleção de texto com a cor da casa */
+::selection {
+  background: rgba(255, 122, 26, 0.25);
+  color: var(--color-fg);
+}
+
+/* Scrollbar sóbria, no tom do cockpit */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 6px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-high);
+}
+
+/* Foco visível e on-brand (acessibilidade) */
+:focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---- Utilitários da casa ---- */
+
+/* Texto técnico em mono com tracking levemente apertado */
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "ss01", "cv01";
+  letter-spacing: -0.01em;
+}
+
+/* Glow reservado pros momentos de progresso */
+.glow {
+  box-shadow: var(--shadow-glow);
+}
+.glow-soft {
+  box-shadow: var(--shadow-glow-soft);
+}
+
+/* Brilho de texto ember (usado em micro-vitórias) */
+.text-glow {
+  text-shadow: 0 0 18px rgba(255, 122, 26, 0.55);
+}
+
+/* Grid sutil de fundo — alma de ferramenta de engenharia */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(42, 42, 52, 0.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(42, 42, 52, 0.35) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ---- Pulso de glow pros momentos de "subir de fase" ---- */
+@keyframes ember-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 122, 26, 0);
+  }
+  50% {
+    box-shadow: 0 0 28px -2px rgba(255, 122, 26, 0.55);
+  }
+}
+.animate-ember-pulse {
+  animation: ember-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-rise-in {
+  animation: rise-in 0.25s ease-out both;
+}
+
+/* Respeita quem pediu menos movimento (acessibilidade, não-negociável) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

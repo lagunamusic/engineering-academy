@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(echo \"=== skill dir ===\" && find /Users/rafabado/.claude/skills/vibecoder-soberano -type f 2>/dev/null)",
-      "Bash(npx --yes create-next-app@latest . --ts --tailwind --app --src-dir --import-alias \"@/*\" --use-npm --eslint --turbopack --yes)"
-    ]
-  }
-}
