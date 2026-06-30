@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isAnthropicConfigured } from "@/lib/ai/anthropic";
+import { friendlyAiError, isAnthropicConfigured } from "@/lib/ai/anthropic";
 import { getModuleById } from "@/lib/modules/loader";
 import { mentorReply, type ChatTurn } from "@/lib/ai/guide";
 import { rateLimit } from "@/lib/ratelimit";
@@ -83,12 +83,6 @@ export async function POST(request: Request) {
     const reply = await mentorReply(mod, turns, parsed.data.draft);
     return NextResponse.json({ reply });
   } catch (err) {
-    return NextResponse.json(
-      {
-        error:
-          err instanceof Error ? err.message : "Falha ao falar com o AI Guide.",
-      },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: friendlyAiError(err) }, { status: 502 });
   }
 }

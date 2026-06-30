@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isAnthropicConfigured } from "@/lib/ai/anthropic";
+import { friendlyAiError, isAnthropicConfigured } from "@/lib/ai/anthropic";
 import { getModuleById } from "@/lib/modules/loader";
 import { evaluateSubmission } from "@/lib/ai/evaluate";
 import { applyEvaluation } from "@/lib/builder/apply-evaluation";
@@ -78,14 +78,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ submissionId, result });
   } catch (err) {
-    return NextResponse.json(
-      {
-        error:
-          err instanceof Error
-            ? err.message
-            : "Falha na avaliação. Sua submissão não foi perdida — tente de novo.",
-      },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: friendlyAiError(err) }, { status: 502 });
   }
 }
