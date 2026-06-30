@@ -29,9 +29,12 @@ export function MissionWorkspace(props: {
 
   const storageKey = `academy:draft:${props.moduleId}`;
 
-  // Recupera rascunho salvo (refresh não perde trabalho).
+  // Recupera rascunho salvo (refresh não perde trabalho). Lê depois de montar
+  // de propósito: no server localStorage não existe, e setar no init causaria
+  // hydration mismatch. Por isso o setState no effect é correto aqui.
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setDraft(saved);
   }, [storageKey]);
 
