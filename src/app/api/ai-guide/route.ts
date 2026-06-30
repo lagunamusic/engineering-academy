@@ -83,6 +83,7 @@ export async function POST(request: Request) {
     const reply = await mentorReply(mod, turns, parsed.data.draft);
     return NextResponse.json({ reply });
   } catch (err) {
+    console.error("[ai-guide] erro:", err);
     return NextResponse.json({ error: friendlyAiError(err) }, { status: 502 });
   }
 }

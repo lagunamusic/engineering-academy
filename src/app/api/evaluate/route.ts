@@ -32,7 +32,9 @@ export async function POST(request: Request) {
   }
 
   // Avaliação é cara: rate limit mais apertado.
-  const rl = rateLimit(`evaluate:${user.id}`, 6, 60_000);
+  // Folga maior: instabilidade da IA faz o Builder re-tentar, e não dá pra
+  // travá-lo por isso. 15/min é suficiente pra impedir abuso real.
+  const rl = rateLimit(`evaluate:${user.id}`, 15, 60_000);
   if (!rl.ok) {
     return NextResponse.json(
       { error: "Muitas submissões seguidas. Respire e tente em instantes." },
@@ -78,6 +80,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ submissionId, result });
   } catch (err) {
+    console.error("[evaluate] erro:", err);
     return NextResponse.json({ error: friendlyAiError(err) }, { status: 502 });
   }
 }
