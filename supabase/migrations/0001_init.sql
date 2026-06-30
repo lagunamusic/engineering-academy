@@ -86,6 +86,7 @@ create table if not exists public.evaluations (
   id                  uuid primary key default gen_random_uuid(),
   submission_id       uuid not null references public.submissions (id) on delete cascade,
   builder_id          uuid not null references public.builders (id) on delete cascade,
+  module_id           text not null,
   rubric_version      text not null,
   resultado_json      jsonb not null,
   gate_passed         boolean not null default false,
