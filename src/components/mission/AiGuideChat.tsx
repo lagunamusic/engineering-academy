@@ -28,11 +28,21 @@ export function AiGuideChat({
       const res = await fetch("/api/ai-guide", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ moduleId, turns: nextTurns }),
+        // Só manda turnos com conteúdo — vazio não trafega.
+        body: JSON.stringify({
+          moduleId,
+          turns: nextTurns.filter((t) => t.content.trim().length > 0),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Falha ao falar com o Guide.");
-      setTurns([...nextTurns, { role: "assistant", content: data.reply }]);
+      setTurns([
+        ...nextTurns,
+        {
+          role: "assistant",
+          content: data.reply || "Me conta mais sobre o seu raciocínio aqui.",
+        },
+      ]);
     } catch (e) {
       // Mantém a mensagem do Builder na tela e oferece retry.
       setTurns(nextTurns);

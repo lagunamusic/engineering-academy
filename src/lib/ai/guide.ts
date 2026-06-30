@@ -32,9 +32,12 @@ export async function mentorReply(
     messages,
   });
 
-  return resp.content
+  const text = resp.content
     .filter((b): b is Anthropic.TextBlock => b.type === "text")
     .map((b) => b.text)
     .join("\n")
     .trim();
+
+  // Nunca devolve vazio: um turno vazio quebraria a conversa seguinte.
+  return text || "Me explica melhor: o que você acha que acontece nesse caso?";
 }

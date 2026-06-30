@@ -13,11 +13,12 @@ const bodySchema = z.object({
     .array(
       z.object({
         role: z.enum(["user", "assistant"]),
-        content: z.string().min(1).max(4000), // teto de custo
+        // Sem min: turno vazio não pode derrubar a validação. Filtramos depois.
+        content: z.string().max(8000),
       }),
     )
     .min(1)
-    .max(40),
+    .max(60),
 });
 
 export async function POST(request: Request) {
@@ -46,10 +47,17 @@ export async function POST(request: Request) {
     );
   }
 
-  // Validação de input no servidor antes de qualquer coisa.
+  // Validação de input no servidor antes de qualquer coisa. Erro descritivo.
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Payload inválido." }, { status: 400 });
+    const detail = parsed.error.issues
+      .map((i) => `${i.path.join(".") || "body"}: ${i.message}`)
+      .join("; ");
+    console.error("[ai-guide] payload inválido:", detail);
+    return NextResponse.json(
+      { error: `Payload inválido — ${detail}` },
+      { status: 400 },
+    );
   }
 
   const mod = await getModuleById(parsed.data.moduleId);
@@ -57,8 +65,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Módulo não encontrado." }, { status: 404 });
   }
 
+  // Descarta turnos vazios (uma resposta vazia da IA não pode travar o chat)
+  // e garante que sobrou algo pra responder.
+  const turns = parsed.data.turns.filter(
+    (t) => t.content.trim().length > 0,
+  ) as ChatTurn[];
+  if (turns.length === 0) {
+    return NextResponse.json(
+      { error: "Mensagem vazia." },
+      { status: 400 },
+    );
+  }
+
   try {
-    const reply = await mentorReply(mod, parsed.data.turns as ChatTurn[]);
+    const reply = await mentorReply(mod, turns);
     return NextResponse.json({ reply });
   } catch (err) {
     return NextResponse.json(
