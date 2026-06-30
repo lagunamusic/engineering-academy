@@ -35,6 +35,14 @@ export async function mentorReply(
     systemBlocks.push({ type: "text", text: buildDraftContext(draft) });
   }
 
+  // Sinal de esforço: quantas vezes o Builder já tentou. Alimenta a ajuda
+  // graduada — depois de ~2-3 tentativas presas, o Guide para de segurar.
+  const builderAttempts = turns.filter((t) => t.role === "user").length;
+  systemBlocks.push({
+    type: "text",
+    text: `ESTADO DA CONVERSA: o Builder já enviou ${builderAttempts} mensagem(ns) nesta missão. Se ele já tentou de verdade umas 2 ou 3 vezes o mesmo ponto e continua preso ou frustrado, NÃO segure mais — dê a resposta concreta com o porquê.`,
+  });
+
   const messages = turns.map((t) => ({
     role: t.role,
     content:
