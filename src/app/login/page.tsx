@@ -11,6 +11,7 @@ type Status = "idle" | "sending" | "sent" | "error";
 function LoginForm() {
   const params = useSearchParams();
   const next = params.get("next") ?? "/cockpit";
+  const authError = params.get("error");
   const configured = isSupabaseConfigured();
 
   const [email, setEmail] = useState("");
@@ -67,6 +68,13 @@ function LoginForm() {
               <p className="mt-1 text-sm text-muted">
                 Te mandamos um link mágico por e-mail. Sem senha pra decorar.
               </p>
+
+              {authError && (
+                <p className="mt-4 rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-xs text-danger">
+                  Falha no login: {authError}. Tenta de novo — e se persistir, me
+                  manda esse texto.
+                </p>
+              )}
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-3">
                 <label className="block">
