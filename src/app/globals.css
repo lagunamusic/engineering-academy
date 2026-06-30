@@ -42,9 +42,37 @@
 }
 
 /* ---- Base ---- */
+:root {
+  --grid-line: rgba(42, 42, 52, 0.35);
+}
 html {
   height: 100%;
   color-scheme: dark;
+}
+
+/* ---- LIGHT MODE — fosco/matte, suave pra usar de dia sem estourar a vista ----
+   Sobrescreve as variáveis de cor; como as utilities do Tailwind v4 usam
+   var(--color-*), o app inteiro acompanha sozinho. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #e7e4de; /* papel morno, não branco estourado */
+  --color-surface: #f0ede8;
+  --color-surface-high: #dbd7cf;
+  --color-border: #cfcbc2;
+  --color-fg: #2c2a26; /* cinza-quente escuro, não preto puro */
+  --color-muted: #6b675e;
+  --color-ember: #c2560c; /* ember mais fundo p/ contrastar no claro */
+  --color-ember-glow: #d97a23;
+  --color-ember-deep: #9c440a;
+  --color-success: #2f7d3a;
+  --color-danger: #bb3a2b;
+  --color-warning: #9a6d12;
+  --color-cooled: #888ca0;
+  --grid-line: rgba(70, 60, 45, 0.07);
+  --shadow-card: 0 1px 3px rgba(60, 55, 45, 0.1),
+    0 0 0 1px rgba(207, 203, 194, 0.7);
+  --shadow-glow: 0 0 22px -4px rgba(194, 86, 12, 0.32);
+  --shadow-glow-soft: 0 0 14px -4px rgba(194, 86, 12, 0.22);
 }
 
 body {
@@ -111,8 +139,8 @@ body {
 /* Grid sutil de fundo — alma de ferramenta de engenharia */
 .bg-grid {
   background-image:
-    linear-gradient(to right, rgba(42, 42, 52, 0.35) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(42, 42, 52, 0.35) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
