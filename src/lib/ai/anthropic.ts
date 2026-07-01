@@ -7,8 +7,10 @@ import Anthropic from "@anthropic-ai/sdk";
 // gates e Boss Projects (decisão de alto risco). Configuráveis por env.
 
 export const MODELS = {
+  // Rotineiro (mentoria/chat): Haiku — rápido e barato, roda a cada mensagem.
   routine: process.env.ANTHROPIC_MODEL_ROUTINE ?? "claude-haiku-4-5-20251001",
-  gate: process.env.ANTHROPIC_MODEL_GATE ?? "claude-sonnet-4-6",
+  // Gate/Boss: Opus 4.8, o mais forte — julgamento afiado no que decide fase.
+  gate: process.env.ANTHROPIC_MODEL_GATE ?? "claude-opus-4-8",
 } as const;
 
 let _client: Anthropic | null = null;
