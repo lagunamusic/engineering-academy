@@ -76,6 +76,7 @@ function ModuleCluster({
           capId={gateId}
           state={capabilities[gateId]}
           isGate
+          index={0}
         />
 
         {/* Nós satélites */}
@@ -86,6 +87,7 @@ function ModuleCluster({
             capId={c.id}
             state={capabilities[c.id]}
             isGate={false}
+            index={i + 1}
           />
         ))}
       </svg>
@@ -98,11 +100,13 @@ function Node({
   capId,
   state,
   isGate,
+  index,
 }: {
   pos: Pos;
   capId: string;
   state?: CapabilityState;
   isGate: boolean;
+  index: number;
 }) {
   const level: CapabilityLevel = state?.level ?? "none";
   const intensity = state?.intensity ?? 0;
@@ -118,7 +122,14 @@ function Node({
       : "var(--color-border)";
 
   return (
-    <g className="transition-transform" style={{ transformOrigin: "center" }}>
+    <g
+      className="animate-bounce-scale"
+      style={{
+        transformBox: "fill-box",
+        transformOrigin: "center",
+        animationDelay: `${index * 0.09}s`,
+      }}
+    >
       {/* halo de glow pros níveis altos */}
       {glow && (
         <circle

@@ -279,6 +279,84 @@ body {
   color: var(--color-muted);
 }
 
+/* ---- Game juice: molas, overshoot, pop, quique ---- */
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* overshoot elástico */
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04) translateY(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-pop {
+  animation: pop-in 0.4s var(--ease-spring) both;
+}
+
+@keyframes bounce-scale {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  78% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-bounce-scale {
+  animation: bounce-scale 0.6s var(--ease-spring) both;
+}
+
+@keyframes burst-ring {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.animate-burst {
+  animation: burst-ring 0.75s ease-out both;
+}
+
+/* Barra que enche com mola (cresce via scaleX, ancorada na esquerda) */
+@keyframes fill-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.animate-fill {
+  transform-origin: left;
+  animation: fill-x 0.7s var(--ease-spring) both;
+}
+
+/* Botões táteis: afundam ao apertar (não nos desabilitados) */
+button {
+  transition: transform 0.12s var(--ease-spring);
+}
+button:not(:disabled):active {
+  transform: scale(0.95);
+}
+
 /* Respeita quem pediu menos movimento (acessibilidade, não-negociável) */
 @media (prefers-reduced-motion: reduce) {
   *,

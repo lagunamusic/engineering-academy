@@ -53,12 +53,20 @@ export default async function ResultPage({
 
         {/* Banner do gate */}
         <section
-          className={`animate-rise-in rounded-lg border p-6 ${
+          className={`animate-pop rounded-lg border p-6 ${
             passed
               ? "border-ember/40 bg-ember/5 glow-soft"
               : "border-border bg-surface"
           }`}
         >
+          {passed && (
+            <div className="relative mb-4 grid h-16 w-16 place-items-center">
+              <span className="animate-burst absolute inset-0 rounded-full bg-ember/40" />
+              <span className="animate-bounce-scale glow relative grid h-16 w-16 place-items-center rounded-full bg-ember text-3xl font-bold text-bg">
+                ✓
+              </span>
+            </div>
+          )}
           <p className="mono text-xs tracking-[0.2em] text-muted">
             RESULTADO DA AVALIAÇÃO
           </p>
@@ -80,12 +88,13 @@ export default async function ResultPage({
             CAPACIDADES
           </p>
           <div className="space-y-3">
-            {result.capabilities.map((c) => {
+            {result.capabilities.map((c, i) => {
               const intensity = intensityForLevel(c.level as CapabilityLevel);
               return (
                 <div
                   key={c.id}
-                  className="rounded-lg border border-border bg-surface p-4"
+                  className="animate-pop rounded-lg border border-border bg-surface p-4"
+                  style={{ animationDelay: `${0.1 + i * 0.08}s` }}
                 >
                   <div className="flex items-center justify-between">
                     <span className="mono text-sm text-fg">{c.id}</span>
@@ -95,9 +104,10 @@ export default async function ResultPage({
                   </div>
                   <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-bg">
                     <div
-                      className="h-full rounded-full bg-ember transition-all"
+                      className="animate-fill h-full rounded-full bg-ember"
                       style={{
                         width: `${intensity}%`,
+                        animationDelay: `${0.25 + i * 0.08}s`,
                         boxShadow:
                           intensity >= 75
                             ? "0 0 12px rgba(255,122,26,0.6)"
