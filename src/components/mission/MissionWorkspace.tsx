@@ -20,6 +20,7 @@ export function MissionWorkspace(props: {
   knowledge?: string;
   capabilities: Cap[];
   opener: string;
+  initialDraft?: string; // última submissão (rede de segurança do banco)
 }) {
   const router = useRouter();
   const [phase, setPhase] = useState<"briefing" | "build">("briefing");
@@ -34,9 +35,12 @@ export function MissionWorkspace(props: {
   // hydration mismatch. Por isso o setState no effect é correto aqui.
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
+    // Rascunho local manda; se não houver, cai pra última submissão do banco.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setDraft(saved);
-  }, [storageKey]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    else if (props.initialDraft) setDraft(props.initialDraft);
+  }, [storageKey, props.initialDraft]);
 
   useEffect(() => {
     localStorage.setItem(storageKey, draft);
@@ -60,7 +64,8 @@ export function MissionWorkspace(props: {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Falha na avaliação.");
-      localStorage.removeItem(storageKey);
+      // Só limpa o rascunho se PASSOU. Reprovou? Mantém pra você iterar.
+      if (data.result?.gate_passed) localStorage.removeItem(storageKey);
       router.push(`/avaliacao/${data.submissionId}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Algo deu errado.");

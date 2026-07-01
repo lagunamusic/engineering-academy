@@ -47,6 +47,17 @@ export default async function MissionPage({
       .eq("module_id", moduleId);
   }
 
+  // Rede de segurança: a última submissão (se houver) vira fallback do editor,
+  // pra um resultado negativo nunca deixar o Builder começar do zero.
+  const { data: lastSub } = await supabase
+    .from("submissions")
+    .select("conteudo")
+    .eq("builder_id", user.id)
+    .eq("module_id", moduleId)
+    .order("criado_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   return (
     <main className="relative min-h-screen">
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-20" />
@@ -62,6 +73,7 @@ export default async function MissionPage({
           knowledge={mod.sections.knowledge}
           capabilities={mod.frontmatter.capabilities}
           opener={OPENER}
+          initialDraft={lastSub?.conteudo ?? undefined}
         />
       </div>
     </main>
